@@ -1,0 +1,19 @@
+.card {
+  position: relative;
+  width: 20%;
+  height: 30%;
+  margin: 5%;
+  box-shadow: grey 2px 3px 3px;
+  border-radius: 15px;
+}
+
+.card.selected {
+  border: 3px black solid;
+}
+
+.card input {
+  position: absolute;
+  bottom: 15px;
+  left: 7%;
+  width: 80%;
+}

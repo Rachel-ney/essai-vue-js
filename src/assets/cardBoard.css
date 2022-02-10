@@ -1,0 +1,20 @@
+.card-board {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  width: 40%;
+  max-width: 700px;
+  height: 500px;
+  background-color: rgb(252, 212, 212);
+}
+
+.card-board button {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  width: 30px;
+  height: 30px;
+  border-radius: 15px;
+  float: right;
+}

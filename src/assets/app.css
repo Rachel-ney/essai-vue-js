@@ -1,0 +1,36 @@
+.container {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 30px;
+}
+
+button {
+  border: none;
+  background-color: orange;
+  box-shadow: grey 2px 3px 3px;
+  color: white;
+  font-weight: bold;
+}
+
+button:hover {
+  background-color: orangered;
+}
+
+button.disabled {
+  background-color: darkgrey;
+}
+
+button.disabled:hover {
+  background-color: grey;
+}
+
+.button-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.button-list button {
+  margin-top: 10px;
+  padding: 5px 15px;
+  border-radius: 5px;
+}
