@@ -27,6 +27,11 @@ export default {
         return newCard;
       }
     },
+    selectCard(event, card) {
+      if (event.target.nodeName === "DIV") {
+        this.$emit("addSelectedCard", card, this.actualBoard);
+      }
+    },
     setCardColor(id, color, noEmit = false) {
       for (const card of this.cards) {
         if (card.id === id) {
@@ -43,16 +48,27 @@ export default {
         }
       }
     },
+    deleteReferenceCard(id) {
+      for (const card of this.cards) {
+        if (card.id === id) {
+          card.clone = {};
+          break;
+        }
+      }
+    },
     setCardClone(id, clone) {
       for (const card of this.cards) {
         if (card.id === id) {
           card.clone = clone;
-          return;
+          break;
         }
       }
     },
     deleteCard(card) {
       this.cards = this.cards.filter((c) => c.id !== card.id);
+      if (card.clone.id !== undefined) {
+        this.$emit("deleteReferenceCard", card.clone.id, this.actualBoard);
+      }
       this.$emit("updateBoardFull", this.actualBoard, this.cards.length === 6);
     },
   },
@@ -74,7 +90,7 @@ export default {
       :color="card.color"
       :isSelected="card === this.selectedCard"
       @onChangeCardColor="setCardColor"
-      @click="$emit('addSelectedCard', card, this.actualBoard)"
+      @click="selectCard($event, card)"
       @deleteCard="deleteCard(card)"
     />
   </div>

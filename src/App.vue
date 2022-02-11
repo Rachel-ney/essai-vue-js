@@ -41,6 +41,9 @@ export default {
     },
     copySelectedCard(byReference = false, deleteAfterCopy = false) {
       if (this.selectedCard.card.id !== undefined) {
+        if (byReference && this.selectedCard.card.clone.id !== undefined) {
+          return;
+        }
         const newCard = this.$refs[this.selectedCard.siblingBoard].addCard({
           color: this.selectedCard.card.color,
           clone: byReference && !deleteAfterCopy ? this.selectedCard.card : {},
@@ -67,6 +70,11 @@ export default {
       const siblingBoard =
         actualBoard === "leftBoard" ? "rightBoard" : "leftBoard";
       this.$refs[siblingBoard].setCardColor(id, color, true);
+    },
+    deleteReferenceCard(id, actualBoard) {
+      const siblingBoard =
+        actualBoard === "leftBoard" ? "rightBoard" : "leftBoard";
+      this.$refs[siblingBoard].deleteReferenceCard(id);
     },
     updateBoardFull(actualBoard, isFull) {
       this.boardFull[actualBoard] = isFull;
@@ -111,6 +119,7 @@ export default {
       "
       @addSelectedCard="addSelectedCard"
       @updateReferenceCard="updateReferenceCard"
+      @deleteReferenceCard="deleteReferenceCard"
       @updateBoardFull="updateBoardFull"
     />
     <div class="button-list">
@@ -133,7 +142,13 @@ export default {
         Copy
       </button>
       <button
-        :class="this.isButtonDisabled() ? 'disabled' : ''"
+        :class="
+          this.isButtonDisabled() ||
+          (this.selectedCard.card.id !== undefined &&
+            this.selectedCard.card.clone.id !== undefined)
+            ? 'disabled'
+            : ''
+        "
         @click="copySelectedCard(true)"
       >
         Reference
@@ -147,6 +162,7 @@ export default {
       "
       @addSelectedCard="addSelectedCard"
       @updateReferenceCard="updateReferenceCard"
+      @deleteReferenceCard="deleteReferenceCard"
       @updateBoardFull="updateBoardFull"
     />
   </div>
