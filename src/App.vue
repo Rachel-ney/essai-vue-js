@@ -48,14 +48,15 @@ export default {
           position: siblingBoard,
         });
 
-        if (newCard && byReference) {
-          this.$refs[this.selectedCard.card.position].setCardClone(
-            this.selectedCard.card.id,
-            newCard
-          );
+        if (newCard) {
+          if (byReference) {
+            this.$refs[this.selectedCard.card.position].setCardClone(
+              this.selectedCard.card.id,
+              newCard
+            );
+          }
+          this.selectedCard.card = {};
         }
-
-        this.selectedCard.card = {};
       }
     },
     moveSelectedCard() {
@@ -73,27 +74,27 @@ export default {
           position: siblingBoard,
         });
 
-        if (newCard && this.selectedCard.card.clone.id !== undefined) {
-          this.$refs[this.selectedCard.card.clone.position].setCardClone(
-            this.selectedCard.card.clone.id,
-            newCard
-          );
-        }
+        if (newCard) {
+          if (this.selectedCard.card.clone.id !== undefined) {
+            this.$refs[this.selectedCard.card.clone.position].setCardClone(
+              this.selectedCard.card.clone.id,
+              newCard
+            );
+          }
 
-        this.$refs[this.selectedCard.card.position].deleteCard(
-          this.selectedCard.card,
-          false
-        );
-        this.selectedCard.card = {};
+          this.$refs[this.selectedCard.card.position].deleteCard(
+            this.selectedCard.card,
+            false
+          );
+          this.selectedCard.card = {};
+        }
       }
     },
     updateReferenceCard(id, color, board) {
       this.$refs[board].setCardColor(id, color, true);
     },
-    deleteReferenceCard(id, actualBoard) {
-      const siblingBoard =
-        actualBoard === "leftBoard" ? "rightBoard" : "leftBoard";
-      this.$refs[siblingBoard].deleteReferenceCard(id);
+    deleteReferenceCard(id, board) {
+      this.$refs[board].deleteReferenceCard(id);
     },
     updateBoardFull(actualBoard, isFull) {
       this.boardFull[actualBoard] = isFull;

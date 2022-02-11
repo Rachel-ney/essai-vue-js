@@ -68,7 +68,7 @@ export default {
     deleteCard(card, deleteReference = true) {
       this.cards = this.cards.filter((c) => c.id !== card.id);
       if (deleteReference && card.clone.id !== undefined) {
-        this.$emit("deleteReferenceCard", card.clone.id, this.actualBoard);
+        this.$emit("deleteReferenceCard", card.clone.id, card.clone.position);
       }
       this.$emit("updateBoardFull", this.actualBoard, this.cards.length === 6);
     },
