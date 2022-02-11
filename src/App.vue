@@ -10,8 +10,6 @@ export default {
     return {
       selectedCard: {
         card: {},
-        actualBoard: "",
-        siblingBoard: "",
       },
       boardFull: {
         leftBoard: false,
@@ -20,56 +18,77 @@ export default {
     };
   },
   methods: {
-    addSelectedCard(card, actualBoard) {
+    addSelectedCard(card) {
       if (this.selectedCard.card === card) {
-        this.resetSelectedCard();
+        this.selectedCard.card = {};
       } else {
-        this.resetSelectedCard();
         this.selectedCard.card = card;
-        this.selectedCard.actualBoard = actualBoard;
-        this.selectedCard.siblingBoard =
-          actualBoard === "leftBoard" ? "rightBoard" : "leftBoard";
       }
     },
     deleteSelectedCard() {
       if (this.selectedCard.card.id !== undefined) {
-        this.$refs[this.selectedCard.actualBoard].deleteCard(
+        this.$refs[this.selectedCard.card.position].deleteCard(
           this.selectedCard.card
         );
-        this.resetSelectedCard();
+        this.selectedCard.card = {};
       }
     },
-    copySelectedCard(byReference = false, deleteAfterCopy = false) {
+    copySelectedCard(byReference = false) {
       if (this.selectedCard.card.id !== undefined) {
         if (byReference && this.selectedCard.card.clone.id !== undefined) {
           return;
         }
-        const newCard = this.$refs[this.selectedCard.siblingBoard].addCard({
+        const siblingBoard =
+          this.selectedCard.card.position === "leftBoard"
+            ? "rightBoard"
+            : "leftBoard";
+        const newCard = this.$refs[siblingBoard].addCard({
           color: this.selectedCard.card.color,
-          clone: byReference && !deleteAfterCopy ? this.selectedCard.card : {},
+          clone: byReference ? this.selectedCard.card : {},
+          position: siblingBoard,
         });
 
-        if (newCard) {
-          if (deleteAfterCopy) {
-            this.$refs[this.selectedCard.actualBoard].deleteCard(
-              this.selectedCard.card
-            );
-          }
-          if (byReference) {
-            this.$refs[this.selectedCard.actualBoard].setCardClone(
-              this.selectedCard.card.id,
-              newCard
-            );
-          }
+        if (newCard && byReference) {
+          this.$refs[this.selectedCard.card.position].setCardClone(
+            this.selectedCard.card.id,
+            newCard
+          );
         }
 
-        this.resetSelectedCard();
+        this.selectedCard.card = {};
       }
     },
-    updateReferenceCard(id, color, actualBoard) {
-      const siblingBoard =
-        actualBoard === "leftBoard" ? "rightBoard" : "leftBoard";
-      this.$refs[siblingBoard].setCardColor(id, color, true);
+    moveSelectedCard() {
+      if (this.selectedCard.card.id !== undefined) {
+        const siblingBoard =
+          this.selectedCard.card.position === "leftBoard"
+            ? "rightBoard"
+            : "leftBoard";
+        const newCard = this.$refs[siblingBoard].addCard({
+          color: this.selectedCard.card.color,
+          clone:
+            this.selectedCard.card.clone !== undefined
+              ? this.selectedCard.card.clone
+              : {},
+          position: siblingBoard,
+        });
+
+        if (newCard && this.selectedCard.card.clone.id !== undefined) {
+          this.$refs[this.selectedCard.card.clone.position].setCardClone(
+            this.selectedCard.card.clone.id,
+            newCard
+          );
+        }
+
+        this.$refs[this.selectedCard.card.position].deleteCard(
+          this.selectedCard.card,
+          false
+        );
+        this.selectedCard.card = {};
+      }
+    },
+    updateReferenceCard(id, color, board) {
+      this.$refs[board].setCardColor(id, color, true);
     },
     deleteReferenceCard(id, actualBoard) {
       const siblingBoard =
@@ -79,25 +98,20 @@ export default {
     updateBoardFull(actualBoard, isFull) {
       this.boardFull[actualBoard] = isFull;
     },
-    resetSelectedCard() {
-      this.selectedCard.card = {};
-      this.selectedCard.actualBoard = "";
-      this.selectedCard.siblingBoard = "";
-    },
     isButtonDisabled() {
       if (this.selectedCard.card.id === undefined) {
         return true;
       }
 
       if (
-        this.selectedCard.actualBoard === "leftBoard" &&
+        this.selectedCard.card.position === "leftBoard" &&
         !this.boardFull.rightBoard
       ) {
         return false;
       }
 
       if (
-        this.selectedCard.actualBoard === "rightBoard" &&
+        this.selectedCard.card.position === "rightBoard" &&
         !this.boardFull.leftBoard
       ) {
         return false;
@@ -125,7 +139,7 @@ export default {
     <div class="button-list">
       <button
         :class="this.isButtonDisabled() ? 'disabled' : ''"
-        @click="copySelectedCard(false, true)"
+        @click="moveSelectedCard()"
       >
         Move
       </button>

@@ -29,7 +29,7 @@ export default {
     },
     selectCard(event, card) {
       if (event.target.nodeName === "DIV") {
-        this.$emit("addSelectedCard", card, this.actualBoard);
+        this.$emit("addSelectedCard", card);
       }
     },
     setCardColor(id, color, noEmit = false) {
@@ -41,12 +41,13 @@ export default {
               "updateReferenceCard",
               card.clone.id,
               color,
-              this.actualBoard
+              card.clone.position
             );
           }
-          break;
+          return true;
         }
       }
+      return false;
     },
     deleteReferenceCard(id) {
       for (const card of this.cards) {
@@ -64,9 +65,9 @@ export default {
         }
       }
     },
-    deleteCard(card) {
+    deleteCard(card, deleteReference = true) {
       this.cards = this.cards.filter((c) => c.id !== card.id);
-      if (card.clone.id !== undefined) {
+      if (deleteReference && card.clone.id !== undefined) {
         this.$emit("deleteReferenceCard", card.clone.id, this.actualBoard);
       }
       this.$emit("updateBoardFull", this.actualBoard, this.cards.length === 6);
@@ -78,7 +79,7 @@ export default {
 <template>
   <div class="card-board">
     <button
-      @click="addCard({ color: '', clone: {} })"
+      @click="addCard({ color: '', clone: {}, position: this.actualBoard })"
       :class="[this.cards.length >= 6 ? 'disabled' : '']"
     >
       +
